@@ -1,11 +1,11 @@
 <?php
 
-namespace WP_CLI\MaintenanceMode;
+namespace FP_CLI\MaintenanceMode;
 
-use WP_CLI;
-use WP_CLI_Command;
-use WP_Upgrader;
-use WP_Filesystem_Base;
+use FP_CLI;
+use FP_CLI_Command;
+use FP_Upgrader;
+use FP_Filesystem_Base;
 
 /**
  * Activates, deactivates or checks the status of the maintenance mode of a site.
@@ -13,34 +13,34 @@ use WP_Filesystem_Base;
  * ## EXAMPLES
  *
  *     # Activate Maintenance mode.
- *     $ wp maintenance-mode activate
+ *     $ fp maintenance-mode activate
  *     Enabling Maintenance mode...
  *     Success: Activated Maintenance mode.
  *
  *     # Deactivate Maintenance mode.
- *     $ wp maintenance-mode deactivate
+ *     $ fp maintenance-mode deactivate
  *     Disabling Maintenance mode...
  *     Success: Deactivated Maintenance mode.
  *
  *     # Display Maintenance mode status.
- *     $ wp maintenance-mode status
+ *     $ fp maintenance-mode status
  *     Maintenance mode is active.
  *
  *     # Get Maintenance mode status for scripting purpose.
- *     $ wp maintenance-mode is-active
+ *     $ fp maintenance-mode is-active
  *     $ echo $?
  *     1
  *
- * @when    after_wp_load
- * @package wp-cli
+ * @when    after_fp_load
+ * @package fp-cli
  */
-class MaintenanceModeCommand extends WP_CLI_Command {
+class MaintenanceModeCommand extends FP_CLI_Command {
 
 
 	/**
-	 * Instance of WP_Upgrader.
+	 * Instance of FP_Upgrader.
 	 *
-	 * @var WP_Upgrader
+	 * @var FP_Upgrader
 	 */
 	private $upgrader;
 
@@ -48,10 +48,10 @@ class MaintenanceModeCommand extends WP_CLI_Command {
 	 * Instantiate a MaintenanceModeCommand object.
 	 */
 	public function __construct() {
-		if ( ! class_exists( 'WP_Upgrader' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+		if ( ! class_exists( 'FP_Upgrader' ) ) {
+			require_once ABSPATH . 'fp-admin/includes/class-fp-upgrader.php';
 		}
-		$this->upgrader = new WP_Upgrader( new WP_CLI\UpgraderSkin() );
+		$this->upgrader = new FP_Upgrader( new FP_CLI\UpgraderSkin() );
 		$this->upgrader->init();
 	}
 
@@ -65,17 +65,17 @@ class MaintenanceModeCommand extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     $ wp maintenance-mode activate
+	 *     $ fp maintenance-mode activate
 	 *     Enabling Maintenance mode...
 	 *     Success: Activated Maintenance mode.
 	 */
 	public function activate( $_, $assoc_args ) {
-		if ( $this->get_maintenance_mode_status() && ! WP_CLI\Utils\get_flag_value( $assoc_args, 'force' ) ) {
-			WP_CLI::error( 'Maintenance mode already activated.' );
+		if ( $this->get_maintenance_mode_status() && ! FP_CLI\Utils\get_flag_value( $assoc_args, 'force' ) ) {
+			FP_CLI::error( 'Maintenance mode already activated.' );
 		}
 
 		$this->upgrader->maintenance_mode( true );
-		WP_CLI::success( 'Activated Maintenance mode.' );
+		FP_CLI::success( 'Activated Maintenance mode.' );
 	}
 
 	/**
@@ -83,17 +83,17 @@ class MaintenanceModeCommand extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     $ wp maintenance-mode deactivate
+	 *     $ fp maintenance-mode deactivate
 	 *     Disabling Maintenance mode...
 	 *     Success: Deactivated Maintenance mode.
 	 */
 	public function deactivate() {
 		if ( ! $this->get_maintenance_mode_status() ) {
-			WP_CLI::error( 'Maintenance mode already deactivated.' );
+			FP_CLI::error( 'Maintenance mode already deactivated.' );
 		}
 
 		$this->upgrader->maintenance_mode( false );
-		WP_CLI::success( 'Deactivated Maintenance mode.' );
+		FP_CLI::success( 'Deactivated Maintenance mode.' );
 	}
 
 	/**
@@ -101,12 +101,12 @@ class MaintenanceModeCommand extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     $ wp maintenance-mode status
+	 *     $ fp maintenance-mode status
 	 *     Maintenance mode is active.
 	 */
 	public function status() {
 		$status = $this->get_maintenance_mode_status() ? 'active' : 'not active';
-		WP_CLI::line( "Maintenance mode is {$status}." );
+		FP_CLI::line( "Maintenance mode is {$status}." );
 	}
 
 	/**
@@ -114,14 +114,14 @@ class MaintenanceModeCommand extends WP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     $ wp maintenance-mode is-active
+	 *     $ fp maintenance-mode is-active
 	 *     $ echo $?
 	 *     1
 	 *
 	 * @subcommand is-active
 	 */
 	public function is_active() {
-		WP_CLI::halt( $this->get_maintenance_mode_status() ? 0 : 1 );
+		FP_CLI::halt( $this->get_maintenance_mode_status() ? 0 : 1 );
 	}
 
 	/**
@@ -130,11 +130,11 @@ class MaintenanceModeCommand extends WP_CLI_Command {
 	 * @return bool
 	 */
 	private function get_maintenance_mode_status() {
-		$wp_filesystem = $this->init_wp_filesystem();
+		$fp_filesystem = $this->init_fp_filesystem();
 
-		$maintenance_file = trailingslashit( $wp_filesystem->abspath() ) . '.maintenance';
+		$maintenance_file = trailingslashit( $fp_filesystem->abspath() ) . '.maintenance';
 
-		if ( ! $wp_filesystem->exists( $maintenance_file ) ) {
+		if ( ! $fp_filesystem->exists( $maintenance_file ) ) {
 			return false;
 		}
 
@@ -142,14 +142,14 @@ class MaintenanceModeCommand extends WP_CLI_Command {
 		// to check if the maintenance is available.
 		$upgrading = 0;
 
-		$contents = (string) $wp_filesystem->get_contents( $maintenance_file );
+		$contents = (string) $fp_filesystem->get_contents( $maintenance_file );
 		$matches  = [];
 		if ( preg_match( '/upgrading\s*=\s*(\d+)\s*;/i', $contents, $matches ) ) {
 			$upgrading = (int) $matches[1];
 		} else {
-			WP_CLI::warning( 'Unable to read the maintenance file timestamp, non-numeric value detected.' );
+			FP_CLI::warning( 'Unable to read the maintenance file timestamp, non-numeric value detected.' );
 		}
-		// The logic here is based on the core WordPress `wp_is_maintenance_mode()` function.
+		// The logic here is based on the core FinPress `fp_is_maintenance_mode()` function.
 		if ( ( time() - $upgrading ) >= 10 * MINUTE_IN_SECONDS ) {
 			return false;
 		}
@@ -157,14 +157,14 @@ class MaintenanceModeCommand extends WP_CLI_Command {
 	}
 
 	/**
-	 * Initializes WP_Filesystem.
+	 * Initializes FP_Filesystem.
 	 *
-	 * @return WP_Filesystem_Base
+	 * @return FP_Filesystem_Base
 	 */
-	protected function init_wp_filesystem() {
-		global $wp_filesystem;
-		WP_Filesystem();
+	protected function init_fp_filesystem() {
+		global $fp_filesystem;
+		FP_Filesystem();
 
-		return $wp_filesystem;
+		return $fp_filesystem;
 	}
 }
