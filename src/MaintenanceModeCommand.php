@@ -1,11 +1,11 @@
 <?php
 
-namespace FP_CLI\MaintenanceMode;
+namespace FIN_CLI\MaintenanceMode;
 
-use FP_CLI;
-use FP_CLI_Command;
-use FP_Upgrader;
-use FP_Filesystem_Base;
+use FIN_CLI;
+use FIN_CLI_Command;
+use FIN_Upgrader;
+use FIN_Filesystem_Base;
 
 /**
  * Activates, deactivates or checks the status of the maintenance mode of a site.
@@ -13,34 +13,34 @@ use FP_Filesystem_Base;
  * ## EXAMPLES
  *
  *     # Activate Maintenance mode.
- *     $ fp maintenance-mode activate
+ *     $ fin maintenance-mode activate
  *     Enabling Maintenance mode...
  *     Success: Activated Maintenance mode.
  *
  *     # Deactivate Maintenance mode.
- *     $ fp maintenance-mode deactivate
+ *     $ fin maintenance-mode deactivate
  *     Disabling Maintenance mode...
  *     Success: Deactivated Maintenance mode.
  *
  *     # Display Maintenance mode status.
- *     $ fp maintenance-mode status
+ *     $ fin maintenance-mode status
  *     Maintenance mode is active.
  *
  *     # Get Maintenance mode status for scripting purpose.
- *     $ fp maintenance-mode is-active
+ *     $ fin maintenance-mode is-active
  *     $ echo $?
  *     1
  *
- * @when    after_fp_load
- * @package fp-cli
+ * @when    after_fin_load
+ * @package fin-cli
  */
-class MaintenanceModeCommand extends FP_CLI_Command {
+class MaintenanceModeCommand extends FIN_CLI_Command {
 
 
 	/**
-	 * Instance of FP_Upgrader.
+	 * Instance of FIN_Upgrader.
 	 *
-	 * @var FP_Upgrader
+	 * @var FIN_Upgrader
 	 */
 	private $upgrader;
 
@@ -48,10 +48,10 @@ class MaintenanceModeCommand extends FP_CLI_Command {
 	 * Instantiate a MaintenanceModeCommand object.
 	 */
 	public function __construct() {
-		if ( ! class_exists( 'FP_Upgrader' ) ) {
-			require_once ABSPATH . 'fp-admin/includes/class-fp-upgrader.php';
+		if ( ! class_exists( 'FIN_Upgrader' ) ) {
+			require_once ABSPATH . 'fin-admin/includes/class-fin-upgrader.php';
 		}
-		$this->upgrader = new FP_Upgrader( new FP_CLI\UpgraderSkin() );
+		$this->upgrader = new FIN_Upgrader( new FIN_CLI\UpgraderSkin() );
 		$this->upgrader->init();
 	}
 
@@ -65,17 +65,17 @@ class MaintenanceModeCommand extends FP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     $ fp maintenance-mode activate
+	 *     $ fin maintenance-mode activate
 	 *     Enabling Maintenance mode...
 	 *     Success: Activated Maintenance mode.
 	 */
 	public function activate( $_, $assoc_args ) {
-		if ( $this->get_maintenance_mode_status() && ! FP_CLI\Utils\get_flag_value( $assoc_args, 'force' ) ) {
-			FP_CLI::error( 'Maintenance mode already activated.' );
+		if ( $this->get_maintenance_mode_status() && ! FIN_CLI\Utils\get_flag_value( $assoc_args, 'force' ) ) {
+			FIN_CLI::error( 'Maintenance mode already activated.' );
 		}
 
 		$this->upgrader->maintenance_mode( true );
-		FP_CLI::success( 'Activated Maintenance mode.' );
+		FIN_CLI::success( 'Activated Maintenance mode.' );
 	}
 
 	/**
@@ -83,17 +83,17 @@ class MaintenanceModeCommand extends FP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     $ fp maintenance-mode deactivate
+	 *     $ fin maintenance-mode deactivate
 	 *     Disabling Maintenance mode...
 	 *     Success: Deactivated Maintenance mode.
 	 */
 	public function deactivate() {
 		if ( ! $this->get_maintenance_mode_status() ) {
-			FP_CLI::error( 'Maintenance mode already deactivated.' );
+			FIN_CLI::error( 'Maintenance mode already deactivated.' );
 		}
 
 		$this->upgrader->maintenance_mode( false );
-		FP_CLI::success( 'Deactivated Maintenance mode.' );
+		FIN_CLI::success( 'Deactivated Maintenance mode.' );
 	}
 
 	/**
@@ -101,12 +101,12 @@ class MaintenanceModeCommand extends FP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     $ fp maintenance-mode status
+	 *     $ fin maintenance-mode status
 	 *     Maintenance mode is active.
 	 */
 	public function status() {
 		$status = $this->get_maintenance_mode_status() ? 'active' : 'not active';
-		FP_CLI::line( "Maintenance mode is {$status}." );
+		FIN_CLI::line( "Maintenance mode is {$status}." );
 	}
 
 	/**
@@ -114,14 +114,14 @@ class MaintenanceModeCommand extends FP_CLI_Command {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     $ fp maintenance-mode is-active
+	 *     $ fin maintenance-mode is-active
 	 *     $ echo $?
 	 *     1
 	 *
 	 * @subcommand is-active
 	 */
 	public function is_active() {
-		FP_CLI::halt( $this->get_maintenance_mode_status() ? 0 : 1 );
+		FIN_CLI::halt( $this->get_maintenance_mode_status() ? 0 : 1 );
 	}
 
 	/**
@@ -130,11 +130,11 @@ class MaintenanceModeCommand extends FP_CLI_Command {
 	 * @return bool
 	 */
 	private function get_maintenance_mode_status() {
-		$fp_filesystem = $this->init_fp_filesystem();
+		$fin_filesystem = $this->init_fin_filesystem();
 
-		$maintenance_file = trailingslashit( $fp_filesystem->abspath() ) . '.maintenance';
+		$maintenance_file = trailingslashit( $fin_filesystem->abspath() ) . '.maintenance';
 
-		if ( ! $fp_filesystem->exists( $maintenance_file ) ) {
+		if ( ! $fin_filesystem->exists( $maintenance_file ) ) {
 			return false;
 		}
 
@@ -142,14 +142,14 @@ class MaintenanceModeCommand extends FP_CLI_Command {
 		// to check if the maintenance is available.
 		$upgrading = 0;
 
-		$contents = (string) $fp_filesystem->get_contents( $maintenance_file );
+		$contents = (string) $fin_filesystem->get_contents( $maintenance_file );
 		$matches  = [];
 		if ( preg_match( '/upgrading\s*=\s*(\d+)\s*;/i', $contents, $matches ) ) {
 			$upgrading = (int) $matches[1];
 		} else {
-			FP_CLI::warning( 'Unable to read the maintenance file timestamp, non-numeric value detected.' );
+			FIN_CLI::warning( 'Unable to read the maintenance file timestamp, non-numeric value detected.' );
 		}
-		// The logic here is based on the core FinPress `fp_is_maintenance_mode()` function.
+		// The logic here is based on the core FinPress `fin_is_maintenance_mode()` function.
 		if ( ( time() - $upgrading ) >= 10 * MINUTE_IN_SECONDS ) {
 			return false;
 		}
@@ -157,14 +157,14 @@ class MaintenanceModeCommand extends FP_CLI_Command {
 	}
 
 	/**
-	 * Initializes FP_Filesystem.
+	 * Initializes FIN_Filesystem.
 	 *
-	 * @return FP_Filesystem_Base
+	 * @return FIN_Filesystem_Base
 	 */
-	protected function init_fp_filesystem() {
-		global $fp_filesystem;
-		FP_Filesystem();
+	protected function init_fin_filesystem() {
+		global $fin_filesystem;
+		FIN_Filesystem();
 
-		return $fp_filesystem;
+		return $fin_filesystem;
 	}
 }

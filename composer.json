@@ -1,8 +1,8 @@
 {
-    "name": "fp-cli/maintenance-mode-command",
-    "type": "fp-cli-package",
+    "name": "fin-cli/maintenance-mode-command",
+    "type": "fin-cli-package",
     "description": "Activates, deactivates or checks the status of the maintenance mode of a site.",
-    "homepage": "https://github.com/fp-cli/maintenance-mode-command",
+    "homepage": "https://github.com/fin-cli/maintenance-mode-command",
     "license": "MIT",
     "authors": [
         {
@@ -12,10 +12,10 @@
         }
     ],
     "require": {
-        "fp-cli/fp-cli": "^2.12"
+        "fin-cli/fin-cli": "^2.12"
     },
     "require-dev": {
-        "fp-cli/fp-cli-tests": "^5"
+        "fin-cli/fin-cli-tests": "^5"
     },
     "config": {
         "process-timeout": 7200,
@@ -42,7 +42,7 @@
     },
     "autoload": {
         "psr-4": {
-            "FP_CLI\\MaintenanceMode\\": "src/"
+            "FIN_CLI\\MaintenanceMode\\": "src/"
         },
         "files": [
             "maintenance-mode-command.php"
@@ -68,6 +68,6 @@
         ]
     },
     "support": {
-        "issues": "https://github.com/fp-cli/maintenance-mode-command/issues"
+        "issues": "https://github.com/fin-cli/maintenance-mode-command/issues"
     }
 }

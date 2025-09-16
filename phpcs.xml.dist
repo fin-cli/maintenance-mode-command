@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
-<ruleset name="FP-CLI-maintenance-mode">
-	<description>Custom ruleset for FP-CLI maintenance-mode-command</description>
+<ruleset name="FIN-CLI-maintenance-mode">
+	<description>Custom ruleset for FIN-CLI maintenance-mode-command</description>
 
 	<!--
 	#############################################################################
@@ -24,11 +24,11 @@
 
 	<!--
 	#############################################################################
-	USE THE FP_CLI_CS RULESET
+	USE THE FIN_CLI_CS RULESET
 	#############################################################################
 	-->
 
-	<rule ref="FP_CLI_CS"/>
+	<rule ref="FIN_CLI_CS"/>
 
 	<!--
 	#############################################################################
@@ -45,8 +45,8 @@
 	<rule ref="FinPress.NamingConventions.PrefixAllGlobals">
 		<properties>
 			<property name="prefixes" type="array">
-				<element value="FP_CLI\MaintenanceMode"/><!-- Namespaces. -->
-				<element value="fpcli_maintenance_mode"/><!-- Global variables and such. -->
+				<element value="FIN_CLI\MaintenanceMode"/><!-- Namespaces. -->
+				<element value="fincli_maintenance_mode"/><!-- Global variables and such. -->
 			</property>
 		</properties>
 	</rule>
